@@ -31,8 +31,9 @@ public interface MunicipalityDB{
   public void addCity(Municipality m);
     
   /**
-   * Returns a reference to a new Municipality, which is fetched by name from the database.
+   * Returns a reference to a new Municipality, which is fetched by name from the database, or null if it couldn't be found.
    * @param name A String with the name of the municipality to fetch.
+   * @return A reference to a Municipality object representing the row found in the database, or null if no such name could be found
    */
   public Municipality getByName(String name);
     

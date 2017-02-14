@@ -55,11 +55,12 @@ public class MyMunicipalities implements MunicipalityDB{
     String url=m.url();
     String server=m.server();
     boolean https=m.supportsHTTPS();
+    int HTTPS = https?1:0;
     String SQL="INSERT INTO municipalities"+
       "(Name,URL,Server,HTTPS)" +
       " VALUES('"+name+"', "+
       "'"+url+"', " +
-      "'" + server + "', 0)";
+      "'" + server + "', "+HTTPS+")";
     System.out.println(db.executeUpdate(SQL)+
                        " rows inserted");
 
@@ -85,7 +86,9 @@ public class MyMunicipalities implements MunicipalityDB{
       db.closeIt(rs);
     }
   }
-
+  /**
+   *
+   */
   public Municipality getByName(String name){
     String SQL="SELECT * FROM municipalities WHERE name='"+name+"'";
 
