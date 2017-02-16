@@ -2,9 +2,10 @@ package org.iths.main;
 import org.iths.db.DBStorage;
 public class Main{
   public static void main(String[] args){
-    
+
+    Storage storage = new DBStorage();    
+
     while(true){
-      Storage storage = new DBStorage();
       String choice = "";
       System.out.println("1. List all movies");
       System.out.println("2. List all actors");
