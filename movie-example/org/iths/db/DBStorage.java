@@ -43,7 +43,7 @@ public class DBStorage implements Storage{
     List<Actor> actors = new ArrayList<>();     
     try{
       con = DriverManager.getConnection("jdbc:sqlite:movies.db");
-      String sql = "select title, name from movies "+
+      String sql = "select title, name, actor_id from movies "+
         "natural join actors_movies natural join actors "+
         "where lower(movies.title) = '" + title.toLowerCase() +"'";
     
@@ -51,6 +51,8 @@ public class DBStorage implements Storage{
       while(rs.next()){
         Actor a = new Actor.ActorBuilder()
           .name(rs.getString("name"))
+          .id(rs.getInt("actor_id"))
+          //.nick("fejknick")
           .build();
         actors.add(a);
       }
