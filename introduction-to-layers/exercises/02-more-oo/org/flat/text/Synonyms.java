@@ -1,20 +1,26 @@
 package org.flat.text;
-import java.util.List;
+
 import java.util.ArrayList;
-public class Synonyms{
+import java.util.List;
+
+public class Synonyms {
+
   private static SynonymsLoader synLoader = new SynonymsLoader();
 
   /* Returns a list of synonyms or an empty list
    * if no synonyms could be found.
    */
-  static List<String>getSynonyms(String word){
+  static List<String>getSynonyms(String word) {
+
     List<String> result = null;
-    if(synLoader.hasLoadedSynonyms()){
+
+    if (synLoader.hasLoadedSynonyms()) {
       result = synLoader.dictionary().get(word);
-    }else{
+    } else {
       throw new RuntimeException("Couldn't load synonyms from source");
     }
-    if(result!=null){
+    
+    if (result != null) {
       return result;
     }
     return new ArrayList<String>();
