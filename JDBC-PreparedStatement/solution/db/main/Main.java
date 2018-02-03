@@ -1,9 +1,13 @@
 package db.main;
+
+import db.app.Municipality;
 import db.app.MunicipalityDB;
 import db.app.MyMunicipalities;
-import db.app.Municipality;
-public class Main{
-  public static void main(String[] args){
+
+public class Main {
+  
+  public static void main(String[] args) {
+    
     MunicipalityDB db = new MyMunicipalities();
     Municipality m 
       = new Municipality("Teststad",
@@ -41,8 +45,10 @@ public class Main{
       }
     */
     //String name="'; drop table municipalities;--";
-    String name="' or 1=1;--";
+    String name = "' or 1=1;--";
     //System.out.println(db.updateHTTPSbyNameSafe(name, false));
     System.out.println(db.updateHTTPSbyName(name, false));
+
   }
+  
 }
