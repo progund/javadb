@@ -1,6 +1,7 @@
 package db.app;
 import java.sql.*;
 import java.io.File;
+
 /**
  * Utility class for handling jdbc towards the my_municipality database.
  * <br />
@@ -10,44 +11,47 @@ import java.io.File;
  * call the static method getInstance(). The instance is guaranteed to
  * have a working Connection to the database my_municipalities.
  */
+public class DBUtils {
 
-public class DBUtils{
   private final static String DB_CONN_STR="jdbc:sqlite:my_municipalities";
   private final static String DB_FILE="my_municipalities"; // Used for debugging
-  static{
-    try{
-      Class.forName("org.sqlite.JDBC");
-    }catch(ClassNotFoundException cnfe){
-      System.err.println("Could not load driver: "+cnfe.getMessage());
-    }
-  }
   private static Connection con;
   private static DBUtils instance = new DBUtils();
-  private DBUtils(){
+
+  static {
+    try {
+      Class.forName("org.sqlite.JDBC");
+    } catch(ClassNotFoundException cnfe) {
+      System.err.println("Could not load driver: " + cnfe.getMessage());
+    }
+  }
+  
+  private DBUtils() {
     getConnection();
   }
+  
   /**
    * Singleton method to get the instance of this class. 
    * @return The only instance of this class
    */
-  public static DBUtils getInstance(){
+  public static DBUtils getInstance() {
     return instance;
   }
     
-  private void getConnection(){
-    try{
+  private void getConnection() {
+    try {
       con = DriverManager.getConnection(DB_CONN_STR);
       System.out.println("DEBUG: We have a connection to " + DB_CONN_STR);
       // Check if the database file is emtpy.
       // Remember, if the database file didn't exist,
       // sqlite3 will create an empty file for you.
       File f = new File(DB_FILE);
-      if(f.length()==0L){
+      if (f.length() == 0L) {
         System.err.println("The database " + 
                            DB_FILE + 
                            " is empty. Did you create the database before running Main?");
       }
-    }catch(Exception e){
+    } catch(Exception e) {
       System.err.println("Error getting connection to " + 
                          DB_CONN_STR);
     }
@@ -62,17 +66,16 @@ public class DBUtils{
 
   private void error(String msg){ System.err.println(msg); }
 
-
   /**
    * Executes a query (from the argument sql, which is a String) and returns a ResultSet.
    * @return A ResultSet from the query
    * @param sql The String representing the SQL query to be executed
    */
-  public ResultSet executeQuery(String sql){
-    Statement stm=null;
-    if(hasConnection()){
-      try{
-        stm=con.createStatement();
+  public ResultSet executeQuery(String sql) {
+    Statement stm = null;
+    if (hasConnection()) {
+      try {
+        stm = con.createStatement();
         return stm.executeQuery(sql);
       }catch(Exception e){
         error("executeQuery: " + e.getMessage());
@@ -88,37 +91,39 @@ public class DBUtils{
    *
    */
   public int executeUpdate(String sql){
-    Statement stm=null;
-    if(hasConnection()){
-      try{
+    Statement stm = null;
+    if (hasConnection()) {
+      try {
         stm=con.createStatement();
         return stm.executeUpdate(sql);
-      }catch(Exception e){
-        error("executeUpdate: "+e.getMessage());
-      }finally{
+      } catch(Exception e) {
+        error("executeUpdate: " + e.getMessage());
+      } finally {
         closeIt(stm);
       }
     }
     return -1;
   }
+  
   /**
    * Closes an AutoCloseable, for instance a ResultSet or a Statement.
    * @param it The AutoCloseable to be closed
    */
-  public void closeIt(AutoCloseable it){     
-    try{
+  public void closeIt(AutoCloseable it) {     
+    try {
       it.close();
-    }catch(Exception e){
-      error("Exception closing: "+e.getMessage());
+    } catch (Exception e) {
+      error("Exception closing: " + e.getMessage());
     }
   }
+  
   /**
    * Not used in Handin03. Only exists here for reference.
    */
-  public PreparedStatement preparedStatement(String sql){
-    try{
+  public PreparedStatement preparedStatement(String sql) {
+    try {
       return con.prepareStatement(sql);
-    }catch(Exception e){
+    } catch (Exception e) {
       System.err.println("DBUtils: Error getting prepared stm: " + e.getMessage());
       e.printStackTrace();
       return null;
