@@ -1,25 +1,31 @@
 package org.iths.main;
+
 import org.iths.db.DBStorage;
-public class Main{
-  public static void main(String[] args){
+
+public class Main {
+  
+  public static void main(String[] args) {
 
     Storage storage = new DBStorage();    
 
-    while(true){
+    while (true) {
+      
       String choice = "";
       System.out.println("1. List all movies");
       System.out.println("2. List all actors");
       System.out.println("3. Look up an actor");
       System.out.println("4. Look up a movie");
       System.out.println("5. Quit");
-      while(!(choice.equals("1")||
-              choice.equals("2")||
-              choice.equals("3")||
-              choice.equals("4")||
-              choice.equals("5"))){
+
+      while(!(choice.equals("1") ||
+              choice.equals("2") ||
+              choice.equals("3") ||
+              choice.equals("4") ||
+              choice.equals("5"))) {
         choice = TextUtil.getReply("Your choice: ");
       }
-      switch(choice){
+      
+      switch (choice) {
       case "1":
         System.out.println(storage.getAllMovies());
         break;
@@ -40,6 +46,9 @@ public class Main{
         System.out.println(" Bye ");
         return;
       }
+      
     }
+    
   }
+  
 }

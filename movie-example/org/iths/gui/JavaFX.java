@@ -1,28 +1,30 @@
 package org.iths.gui;
 
+import java.util.ArrayList;
+import java.util.List;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import javafx.scene.text.*;
-import javafx.geometry.*;
-import java.util.List;
-import java.util.ArrayList;
+import javafx.stage.Stage;
 
-import org.iths.domain.*;
 import org.iths.db.*;
+import org.iths.domain.*;
 import org.iths.main.Storage;
 
 public class JavaFX extends Application {
+  
   public static void main(String[] args) {
     launch(args);
   }
 
   @Override
   public void start(Stage primaryStage) {
+
     Storage storage = new DBStorage();
     primaryStage.setTitle("Movie example");
     GridPane grid = new GridPane();
@@ -58,26 +60,39 @@ public class JavaFX extends Application {
           results.clear();
           List<Actor>actors=storage.getActorsByMovieTitle(searchTextField.getText());
           List<Movie>movies=storage.getMoviesByActorName(searchTextField.getText());
-          for(Actor a : actors){
+
+          for (Actor a : actors) {
             results.appendText("Actor: " + a.toString() + "\n");
           }
-          for(Movie m : movies){
+          
+          for (Movie m : movies) {
             results.appendText("Played in: " + m.toString() + "\n");
           }
-          if(actors.size()==0 && movies.size()==0 && !results.getText().startsWith("No results")){
+          
+          if (actors.size() == 0 &&
+              movies.size() == 0 &&
+              !results.getText().startsWith("No results")) {
+
             results.appendText("No results for ");
             results.appendText(searchTextField.getText());
+
           }
+          
           searchTextField.selectAll();
           searchTextField.requestFocus();
+
         }
       };
+    
     btn.setOnAction(handler);
     searchTextField.setOnAction(handler);
     Scene scene = new Scene(grid, 600, 475);
     scene.getStylesheets()
-      .add(org.iths.gui.JavaFX.class.getResource("style.css").toExternalForm());
+      .add(org.iths.gui.JavaFX.class.getResource("style.css")
+           .toExternalForm());
     primaryStage.setScene(scene);
     primaryStage.show();
+    
   }
+  
 }

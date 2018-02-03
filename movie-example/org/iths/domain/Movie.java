@@ -1,24 +1,33 @@
 package org.iths.domain;
-public class Movie{
+
+public class Movie {
+  
   private String title;
   
-  private Movie(MovieBuilder mb){
+  private Movie(MovieBuilder mb) {
     this.title = mb.title;
   }
-  public static class MovieBuilder{
+  
+  public static class MovieBuilder {
+    
     private String title;
-    public MovieBuilder(){      
+
+    public MovieBuilder() {      
     }
-    public MovieBuilder title(String title){
+    
+    public MovieBuilder title(String title) {
       this.title = title;
       return this;
     }
-    public Movie build(){
+    
+    public Movie build() {
       return new Movie(this);
     }
   }
+  
   @Override
-  public String toString(){
+  public String toString() {
     return title;
   }
+  
 }
