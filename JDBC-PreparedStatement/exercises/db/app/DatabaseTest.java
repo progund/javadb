@@ -1,135 +1,167 @@
 package db.app;
+
 import java.sql.*;
 
-public class DatabaseTest{
+public class DatabaseTest {
     
-  private final static String DB_CONN_STR="jdbc:sqlite:my_municipalities";
-  static{
-    try{
+  private final static String DB_CONN_STR = "jdbc:sqlite:my_municipalities";
+  private static Connection con;
+
+  static {
+    try {
       Class.forName("org.sqlite.JDBC");
-    }catch(ClassNotFoundException cnfe){
-      System.err.println("Could not load driver: "+cnfe.getMessage());
+    } catch (ClassNotFoundException cnfe) {
+      System.err.println("Could not load driver: " + cnfe.getMessage());
     }
   }
     
-  private static Connection con;
-  public DatabaseTest(){
+  public DatabaseTest() {
     getConnection();
   }
-  private void getConnection(){
-    try{
+  
+  private void getConnection() {
+
+    try {
       con = DriverManager.getConnection(DB_CONN_STR);
-    }catch(Exception e){
+    } catch (Exception e) {
       System.err.println("Error getting connection to " + 
                          DB_CONN_STR);
     }
   }
-  public boolean hasConnection(){
+  
+  public boolean hasConnection() {
     return con != null;
   }
-  public void testQuery(){
-    if(hasConnection()){
+  
+  public void testQuery() {
+    
+    if (hasConnection()) {
       Statement stm = null;
       ResultSet rs  = null;
-      try{
-        String query="SELECT Name, HTTPS FROM municipalities LIMIT 5";
+
+      try {
+        String query = "SELECT Name, HTTPS FROM municipalities LIMIT 5";
         stm = con.createStatement();
         rs = stm.executeQuery(query);
-        while(rs.next()){
+        
+        while (rs.next()) {
           System.out.println(rs.getString("Name") + " " + (rs.getBoolean("HTTPS")?"HTTPS support":"HTTP only"));
         }
-      }catch(SQLException sqle){
+        
+      } catch (SQLException sqle) {
         System.err.println(sqle.getMessage());
-      }finally{
+      } finally {
         closeBoth(rs, stm);
       }
+      
     }
+
   }
-  private void closeIt(AutoCloseable it){     
-    try{
+  
+  private void closeIt(AutoCloseable it) {     
+    try {
       it.close();
-    }catch(Exception e){
+    } catch (Exception e) {
       System.err.println("Exception closing: "+e.getMessage());
     }
   }
-  private void closeBoth(AutoCloseable a1, AutoCloseable a2){
-    try{
+  
+  private void closeBoth(AutoCloseable a1, AutoCloseable a2) {
+
+    try {
       closeIt(a1);          
       closeIt(a2);
-    }catch(Exception e){
+    } catch (Exception e) {
       System.err.println("Exception closing: "+e.getMessage());
     }
+
   }
     
-  public int deleteCity(String name){
+  public int deleteCity(String name) {
+    
     String SQL = "DELETE FROM municipalities" +
       " WHERE Name='" + name + "'";
     Statement stm = null;
     int rows = -1;
-    try{
+
+    try {
       stm  = con.createStatement();
       rows = stm.executeUpdate(SQL);
-    }catch(Exception e){
+    } catch (Exception e) {
       System.err.println("Exception deleting " + name
                          + " " + e.getMessage());
-    }finally{
+    } finally {
       closeIt(stm);
       return rows;
     }
+    
   }
     
-  public int updateHTTPS(String name, boolean https){
+  public int updateHTTPS(String name, boolean https) {
+
     String SQL = "UPDATE municipalities SET HTTPS=" + 
-      (https?"1":"0") + 
+      (https ? "1" : "0") + 
       " WHERE Name='" + name + "'";
     Statement stm = null;
     int rows = -1;
-    try{
+    
+    try {
       stm  = con.createStatement();
       rows = stm.executeUpdate(SQL);
-    }catch(Exception e){
+    } catch (Exception e) {
       System.err.println("Exception updating https for " + name 
                          + " " + e.getMessage());
-    }finally{
+    } finally {
       closeIt(stm);
       return rows;
     }
+    
   }
 
-  public void testInsert(){
+  public void testInsert() {
     String SQL = "INSERT INTO municipalities(Name, URL, HTTPS, Server) " +
       "VALUES('Ingalunda stad', 'http://ingalunda.se', 0, 'IIS')";
-    Statement stm=null;
-    try{
+    Statement stm = null;
+    
+    try {
       stm = con.createStatement();
       stm.executeUpdate(SQL);
-    }catch(Exception e){
+    } catch (Exception e) {
       System.err.println("Exception inserting: " + e.getMessage());
-    }finally{
+    } finally {
       closeIt(stm);
     }
+    
   }
-  public String fetchCity(String name){
+  
+  public String fetchCity(String name) {
+    
     String result = null;
     Statement stm = null;
-    ResultSet rs  = null;
-    String query  = "SELECT * FROM municipalities WHERE Name='"+name+"'";
-    try{
+    ResultSet rs = null;
+    String query = "SELECT * FROM municipalities WHERE Name='" + name + "'";
+    
+    try {
+      
       stm = con.createStatement();
       rs = stm.executeQuery(query);
-      if(rs.next()){
+
+      if (rs.next()) {
         result = rs.getString("Name") + " - " +
           rs.getString("URL")       + " - " +
-          (rs.getBoolean("HTTPS")?"https support":"only http") + " - " +
+          (rs.getBoolean("HTTPS") ? "https support" : "only http") + " - " +
           rs.getString("Server");
-      }else{
+      } else {
         result = "No such city: " + name;
       }
-    }catch(Exception e){
+      
+    } catch (Exception e) {
       System.err.println("Exception fetching " + name + ": " + e.getMessage());
-    }finally{
+    } finally {
       closeBoth(rs, stm);
       return result;
     }
+    
   }
+  
 }
