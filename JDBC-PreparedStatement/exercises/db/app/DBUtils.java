@@ -65,15 +65,15 @@ public class DBUtils {
    */
   public ResultSet executeQuery(String sql) {
 
-    Statement stm=null;
 
     if (hasConnection()) {
-      try {
-        stm = con.createStatement();
+      // Try-with-resources version:
+      try (
+           Statement stm = con.createStatement();
+           ) {
         return stm.executeQuery(sql);
       } catch (Exception e) {
         error("executeQuery: " + e.getMessage());
-        closeIt(stm);
       }
     }
     
