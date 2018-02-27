@@ -14,12 +14,10 @@ public class MyMunicipalities implements MunicipalityDB {
   public List<Municipality> getAllCities() {
     
     ArrayList<Municipality> list = new ArrayList<Municipality>();
-    ResultSet rs = db.executeQuery("SELECT * FROM municipalities");
 
-    try {
-
+    try ( ResultSet rs = db.executeQuery("SELECT * FROM municipalities"); ) {
       Municipality m = null;
-
+      
       while (rs.next()) {
         m = new Municipality(rs.getString("Name"),
                              rs.getString("URL"),
@@ -29,16 +27,12 @@ public class MyMunicipalities implements MunicipalityDB {
         list.add(m);
       }
       
-      db.closeIt(rs);
       return list;
-
+      
     } catch (Exception e) {
       System.err.println("Getting all municipalities: " + e.getMessage());
-      db.closeIt(rs);
-    }
-    
+    }    
     return null;
-
   }
 
   public void updateCity(Municipality m) {
