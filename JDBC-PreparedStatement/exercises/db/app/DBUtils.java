@@ -65,8 +65,16 @@ public class DBUtils {
    */
   public ResultSet executeQuery(String sql) {
 
-
+    Statement stm = null;
     if (hasConnection()) {
+      try {
+        stm = con.createStatement();
+          return stm.executeQuery(sql);
+        } catch (Exception e) {
+          error("executeQuery: " + e.getMessage());
+          closeIt(stm);
+        }
+      /*
       // Try-with-resources version:
       try (
            Statement stm = con.createStatement();
@@ -75,6 +83,7 @@ public class DBUtils {
       } catch (Exception e) {
         error("executeQuery: " + e.getMessage());
       }
+      */
     }
     
     return null;
