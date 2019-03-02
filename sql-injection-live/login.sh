@@ -5,8 +5,8 @@ PASSWORD="$2"
 
 SQL="SELECT real_name FROM user NATURAL JOIN login WHERE username='$USERNAME' AND password = '$PASSWORD';"
 
-echo $SQL
-exit 0
+#echo $SQL
+#exit 0
 
 REAL_NAME=$(sqlite3 login.db "$SQL")
 
