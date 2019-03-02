@@ -158,4 +158,5 @@ Now, verify that you can do a "real" login:
 $ ./login.sh rikard sikrit
 Welcome Rikard Fröberg
 
-
+6. The Java version
+We'll walk you through the code and how to abuse it.
