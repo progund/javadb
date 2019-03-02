@@ -3,8 +3,129 @@ Using user input as part of a dynamic SQL query is not very safe.
 
 We'll see some examples of why.
 
-1 Understanding the WHERE clause.
+1 Example login database.
 
 Let's say we have a login system where username and password are stored
 in a table login:
+
+CREATE TABLE user(user_id INTEGER NOT NULL PRIMARY KEY, username TEXT NOT NULL UNIQUE, real_name TEXT NOT NULL);
+INSERT INTO "user" VALUES(1,'rikard','Rikard Fröberg');
+INSERT INTO "user" VALUES(2,'henrik','Henrik Sandklef');
+
+CREATE TABLE login(user_id REFERENCES user(user_id) NOT NULL, password TEXT NOT NULL, PRIMARY KEY(user_id, password));
+INSERT INTO "login" VALUES(1,'sikrit');
+INSERT INTO "login" VALUES(2,'letmein');
+
+So, username rikard has password 'sikrit' and username henrik has password 'letmein'.
+
+We could verify a login like this:
+
+SELECT real_name
+  FROM user NATURAL JOIN login
+ WHERE username='rikard'
+   AND password='sikrit';
+Rikard Fröberg
+
+If we get NULL, either the username or the password is wrong.
+
+2. Understanding the WHERE clause
+What would the result of the following be?
+SELECT real_name FROM user NATURAL JOIN login WHERE username='rikard' AND password='sikrit' OR 1=1;
+
+What would the result of the following be?
+SELECT real_name FROM user NATURAL JOIN login WHERE username='rikard' AND password='wrong'; SELECT user_id, password FROM login;
+
+Note the semicolon!
+
+What would the result of the following be?
+
+sqlite> .headers on
+sqlite> SELECT real_name FROM user NATURAL JOIN login WHERE username='rikard' AND password='wrong'; SELECT user_id, password AS real_name FROM login;
+
+Note the semicolon and the "AS real_name" part!
+
+Answer:
+user_id|real_name
+1|sikrit
+2|letmein
+
+3. The use of comments in SQL
+
+A comment in SQL is everything after "--" (two dashes):
+
+sqlite> SELECT * FROM user WHERE username='rikard'; -- This is a comment!
+1|rikard|Rikard Fröberg
+
+4. What is the problem with all that?
+If we have a login system written in Java, and the Java program issues the following SQL via JDBC:
+SELECT real_name FROM user NATURAL JOIN login WHERE username='rikard' AND password='sikrit';
+
+Where does the Java program get the strings for username and password from?
+
+It gets it from user input!
+
+How do you construct the SQL String inside Java?
+
+A typical (but naïve) way would be a method like this:
+
+private String verifyLogin(String username, String password) {
+  String SQL = "SELECT real_name FROM user NATURAL JOIN login WHERE username='" +
+               username +
+               "' AND password = '" +
+               password +
+               "';";
+  // The method executes the query and reads the column "real_name" from
+  // the resultset - maybe creates a welcome message like:
+  // String welcome = "Welcome " + rs.getString("real_name");
+  // or an error message "Wrong username or password" if real_name is null
+}
+
+The same thing in a Bash script would look like this:
+
+#!/bin/bash
+
+USERNAME="$1"
+PASSWORD="$2"
+
+SQL="SELECT real_name FROM user NATURAL JOIN login WHERE username='$USERNAME' AND password = '$PASSWORD';"
+
+REAL_NAME=$(sqlite3 login.db "$SQL")
+
+WELCOME_MSG="Wrong username or password"
+if [[ ! -z "$REAL_NAME" ]]
+then
+    WELCOME_MSG="Welcome $REAL_NAME"
+fi                   
+
+echo "$WELCOME_MSG"
+
+We run the script like this:
+
+$ ./login.sh rikard sikrit
+Welcome Rikard Fröberg
+$ ./login.sh rikard wrong
+Wrong username or password
+$
+
+Can we trust user input?
+
+4. What if the user input contains SQL?
+
+Remember this:
+SELECT real_name FROM user NATURAL JOIN login WHERE username='rikard' AND password='sikrit' OR 1=1;
+
+What is the result of running the script like this:
+
+$ ./login.sh whatever "' OR 1=1;--"
+
+Think about what the SQL variable will be after this:
+
+SQL="SELECT real_name FROM user NATURAL JOIN login WHERE username='$USERNAME' AND password = '$PASSWORD';"
+
+Let's just print it from the script!
+
+$ ./login.sh whatever "' OR 1=1; --"
+SELECT real_name FROM user NATURAL JOIN login WHERE username='whatever' AND password = '' OR 1=1; --';
+
+Is the following valid SQL syntax?
 
