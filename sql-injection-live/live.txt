@@ -1,0 +1,10 @@
+0. Background
+Using user input as part of a dynamic SQL query is not very safe.
+
+We'll see some examples of why.
+
+1 Understanding the WHERE clause.
+
+Let's say we have a login system where username and password are stored
+in a table login:
+
